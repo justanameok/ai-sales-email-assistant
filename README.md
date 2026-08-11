@@ -34,12 +34,22 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Add your OpenAI API key to `.env`:
+This project uses any OpenAI-compatible API. Edit only these values in `.env`:
 
 ```
-OPENAI_API_KEY=your_key_here
+LLM_API_KEY=your_key_here
+LLM_BASE_URL=https://api.deepseek.com
+LLM_MODEL=deepseek-chat
 ```
 
+Examples:
+
+| Provider | LLM_BASE_URL | LLM_MODEL |
+|----------|--------------|-----------|
+| DeepSeek | `https://api.deepseek.com` | `deepseek-chat` |
+| OpenAI | _(leave empty)_ | `gpt-4o-mini` |
+
+DeepSeek keys: https://platform.deepseek.com/api_keys
 ## Run
 
 ```bash
