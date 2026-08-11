@@ -49,7 +49,12 @@ class LeadScore(BaseModel):
 
 
 class SuggestedReply(BaseModel):
-    """Suggested reply to a customer email."""
+    """Suggested draft reply to a customer email."""
 
-    subject: str = Field(default="", description="Suggested email subject")
-    body: str = Field(description="Suggested reply body")
+    subject: str = Field(description="Suggested email subject line")
+    email_body: str = Field(description="Full suggested reply email body")
+    tone: str = Field(description="Tone of the reply, e.g. professional, consultative")
+    key_points: list[str] = Field(
+        default_factory=list,
+        description="Key points covered in the reply",
+    )
