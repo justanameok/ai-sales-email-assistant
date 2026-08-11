@@ -13,13 +13,23 @@ from services.email_analyzer import (  # noqa: E402
     MissingAPIKeyError,
     analyze_email,
 )
+from services.lead_scorer import LeadScoringError, score_lead  # noqa: E402
+
+
+def _render_bullet_list(items: list, empty_label: str = "None identified") -> None:
+    if items:
+        for item in items:
+            st.write(f"- {item}")
+    else:
+        st.write(empty_label)
+
 
 st.set_page_config(page_title="AI Sales Email Assistant", layout="centered")
 
 st.title("AI Sales Email Assistant")
 st.write(
     "Paste a customer email below to analyze intent, extract key details, "
-    "and get recommended next sales actions."
+    "score the lead, and get recommended next sales actions."
 )
 
 customer_email = st.text_area(
@@ -36,6 +46,9 @@ if st.button("Analyze", type="primary"):
             with st.spinner("Analyzing email..."):
                 analysis = analyze_email(customer_email)
 
+            with st.spinner("Scoring lead..."):
+                lead_score = score_lead(analysis)
+
             st.subheader("Analysis results")
 
             st.markdown("**Customer Intent**")
@@ -51,22 +64,30 @@ if st.button("Analyze", type="primary"):
             st.write(analysis.urgency)
 
             st.markdown("**Missing Information**")
-            if analysis.missing_information:
-                for item in analysis.missing_information:
-                    st.write(f"- {item}")
-            else:
-                st.write("None identified")
+            _render_bullet_list(analysis.missing_information)
 
             st.markdown("**Recommended Actions**")
-            if analysis.recommended_action:
-                for item in analysis.recommended_action:
-                    st.write(f"- {item}")
-            else:
-                st.write("None identified")
+            _render_bullet_list(analysis.recommended_action)
+
+            st.subheader("Lead Score")
+
+            st.markdown("**Lead Score**")
+            st.write(f"{lead_score.score}/100")
+
+            st.markdown("**Priority**")
+            st.write(lead_score.priority.upper())
+
+            st.markdown("**Reasoning**")
+            _render_bullet_list(lead_score.reasoning)
+
+            st.markdown("**Recommended Next Steps**")
+            _render_bullet_list(lead_score.recommended_next_step)
 
         except MissingAPIKeyError as exc:
             st.error(str(exc))
         except EmailAnalysisError as exc:
             st.error(f"Analysis failed: {exc}")
+        except LeadScoringError as exc:
+            st.error(f"Lead scoring failed: {exc}")
         except Exception as exc:
-            st.error(f"Unexpected error while analyzing the email: {exc}")
+            st.error(f"Unexpected error: {exc}")

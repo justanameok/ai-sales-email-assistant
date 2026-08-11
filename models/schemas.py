@@ -33,6 +33,21 @@ class EmailAnalysis(BaseModel):
     )
 
 
+class LeadScore(BaseModel):
+    """Sales opportunity quality score derived from EmailAnalysis."""
+
+    score: int = Field(ge=0, le=100, description="Lead score from 0 to 100")
+    priority: str = Field(description="Lead priority: HIGH, MEDIUM, or LOW")
+    reasoning: list[str] = Field(
+        default_factory=list,
+        description="Reasons explaining the score and priority",
+    )
+    recommended_next_step: list[str] = Field(
+        default_factory=list,
+        description="Recommended next steps for the sales team",
+    )
+
+
 class SuggestedReply(BaseModel):
     """Suggested reply to a customer email."""
 
